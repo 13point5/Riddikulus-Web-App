@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { Typography, Button, Autocomplete, TextField } from "@mui/material";
 import { Container, Stack } from "@mui/system";
+import * as styles from "./styles";
 
 interface ThemeOption {
   label: string;
@@ -87,46 +88,19 @@ function App() {
   };
 
   return (
-    <Container
-      sx={{
-        my: "2rem",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 4,
-      }}
-      maxWidth="xl"
-    >
+    <Container sx={styles.container} maxWidth="xl">
       <Typography variant="h3">Thematify your Boring Math assignments!</Typography>
-      <Stack
-        sx={{
-          gap: 5,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          height: "80vh",
-          width: "100%",
-        }}
-      >
-        <Stack
-          sx={{
-            gap: 1,
-            alignItems: "center",
-            height: "100%",
-            width: "100%",
-          }}
-        >
+      <Stack sx={styles.mainContent}>
+        <Stack sx={styles.questionsContainer}>
           <Typography variant="h5">Questions</Typography>
           <textarea
             value={questionsTxt}
             onChange={(e) => setQuestionsTxt(e.target.value)}
-            style={{
-              height: "100%",
-              width: "100%",
-            }}
+            style={styles.questionTextarea}
           />
         </Stack>
 
-        <Stack>
+        <Stack sx={styles.actionColumn}>
           <Autocomplete
             disablePortal
             id="combo-box-demo"
@@ -139,32 +113,20 @@ function App() {
           />
 
           <Button
+            variant="contained"
             onClick={bla}
             sx={{
               height: "fit-content",
             }}
+            disableElevation
           >
             Thematify the question!
           </Button>
         </Stack>
 
-        <Stack
-          sx={{
-            gap: 1,
-            alignItems: "center",
-            height: "100%",
-            width: "100%",
-          }}
-        >
+        <Stack sx={styles.questionsContainer}>
           <Typography variant="h5">Thematified questions</Typography>
-          <textarea
-            readOnly
-            value={thematifiedQuestions.data}
-            style={{
-              height: "100%",
-              width: "100%",
-            }}
-          />
+          <textarea readOnly value={thematifiedQuestions.data} style={styles.questionTextarea} />
         </Stack>
       </Stack>
     </Container>
