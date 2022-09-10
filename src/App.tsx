@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import * as R from "ramda";
 import axios from "axios";
 
-import { Typography, Button, Autocomplete, TextField } from "@mui/material";
+import { Typography, Autocomplete, TextField } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { Container, Stack } from "@mui/system";
 import * as styles from "./styles";
 
@@ -26,7 +26,7 @@ const themes: ThemeOption[] = [
   },
 ];
 
-const getThematifiedQuestion = (question: string, theme: string) =>
+const fetchThematifiedQuestion = (question: string, theme: string) =>
   axios.get("http://localhost:8000/thematifyQuestion", {
     params: {
       question,
@@ -48,14 +48,14 @@ function App() {
   });
 
   const handleThemeChange = (e: React.SyntheticEvent, value: ThemeOption | null) => {
-    if (R.isNil(value)) {
+    if (!value) {
       setTheme(null);
     } else {
       setTheme(value);
     }
   };
 
-  const bla = async () => {
+  const fetchThematifiedQuestions = async () => {
     if (!theme) return;
 
     try {
@@ -66,7 +66,7 @@ function App() {
       });
 
       const questions = questionsTxt.split("\n\n");
-      const questionRequests = questions.map((question) => getThematifiedQuestion(question, theme.value));
+      const questionRequests = questions.map((question) => fetchThematifiedQuestion(question, theme.value));
 
       const results = await Promise.all(questionRequests);
       const thematifiedQuestions = results.map((result) => result.data.result);
@@ -112,16 +112,17 @@ function App() {
             renderInput={(params) => <TextField {...params} label="Theme" />}
           />
 
-          <Button
+          <LoadingButton
             variant="contained"
-            onClick={bla}
+            onClick={fetchThematifiedQuestions}
+            loading={thematifiedQuestions.fetching}
             sx={{
               height: "fit-content",
             }}
             disableElevation
           >
             Thematify the question!
-          </Button>
+          </LoadingButton>
         </Stack>
 
         <Stack sx={styles.questionsContainer}>
