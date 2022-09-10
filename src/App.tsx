@@ -89,10 +89,10 @@ function App() {
 
   return (
     <Container sx={styles.container} maxWidth="xl">
-      <Typography variant="h3">Thematify your Boring Math assignments!</Typography>
+      <Typography variant="h3">No more Boring Math problems!</Typography>
       <Stack sx={styles.mainContent}>
         <Stack sx={styles.questionsContainer}>
-          <Typography variant="h5">Questions</Typography>
+          <Typography variant="h5">💤 Boring problems</Typography>
           <textarea
             value={questionsTxt}
             onChange={(e) => setQuestionsTxt(e.target.value)}
@@ -118,18 +118,21 @@ function App() {
             loading={thematifiedQuestions.fetching}
             sx={{
               height: "fit-content",
+              textTransform: "none",
             }}
             disableElevation
           >
-            Thematify the question!
+            Riddikulus!
           </LoadingButton>
         </Stack>
 
         <Stack sx={styles.questionsContainer}>
-          <Typography variant="h5">Thematified questions</Typography>
+          <Typography variant="h5">🔥 Noice problems</Typography>
           <textarea readOnly value={thematifiedQuestions.data} style={styles.questionTextarea} />
         </Stack>
       </Stack>
+
+      <Typography>Made with 🪄 by 13point5</Typography>
     </Container>
   );
 }
