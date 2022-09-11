@@ -1,30 +1,45 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-import { Typography, Autocomplete, TextField } from "@mui/material";
+import { Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Container, Stack } from "@mui/system";
+import ThemeCard from "./components/ThemeCard";
 import * as styles from "./styles";
 
 interface ThemeOption {
   label: string;
   value: string;
+  imgUrl: string;
 }
 
 const themes: ThemeOption[] = [
   {
     label: "Iron Man",
     value: "iron-man",
+    imgUrl:
+      "https://images.unsplash.com/photo-1626278664285-f796b9ee7806?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
   },
   {
     label: "Harry Potter",
     value: "hp1",
+    imgUrl:
+      "https://images.unsplash.com/photo-1598153346810-860daa814c4b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
   },
   {
     label: "The Adventure of the Three Gables",
     value: "ad3g",
+    imgUrl: "https://i.pinimg.com/564x/96/82/cb/9682cbac938474c397648fceb9f38077.jpg",
+  },
+  {
+    label: "Naruto",
+    value: "naruto",
+    imgUrl:
+      "https://occ-0-2085-2164.1.nflxso.net/dnm/api/v6/X194eJsgWBDE2aQbaNdmCXGUP-Y/AAAABTvqllg5Y66HHl6EeTuzL9MGXF2w11Zd3IxhQz2O7DkQY55UaHADxO2EUYASlggL9b_9nRepZu-X5Y5MBaA9XzE1vOFE-2O_CUU.webp?r=f87",
   },
 ];
+
+const validThemes = ["iron-man", "hp1", "ad3g"];
 
 const fetchThematifiedQuestion = (question: string, theme: string) =>
   axios.get("http://localhost:8000/thematifyQuestion", {
@@ -36,7 +51,7 @@ const fetchThematifiedQuestion = (question: string, theme: string) =>
 
 function App() {
   const [questionsTxt, setQuestionsTxt] = useState("");
-  const [theme, setTheme] = useState<ThemeOption | null>(themes[0]);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [thematifiedQuestions, setThematifiedQuestions] = useState<{
     fetching: boolean;
     error: string | null;
@@ -47,16 +62,9 @@ function App() {
     data: "",
   });
 
-  const handleThemeChange = (e: React.SyntheticEvent, value: ThemeOption | null) => {
-    if (!value) {
-      setTheme(null);
-    } else {
-      setTheme(value);
-    }
-  };
-
   const fetchThematifiedQuestions = async () => {
-    if (!theme) return;
+    const validSelectedThemes = selectedThemes.filter((item) => validThemes.includes(item));
+    if (validSelectedThemes.length === 0) return;
 
     try {
       setThematifiedQuestions({
@@ -66,7 +74,9 @@ function App() {
       });
 
       const questions = questionsTxt.split("\n\n");
-      const questionRequests = questions.map((question) => fetchThematifiedQuestion(question, theme.value));
+      const questionRequests = questions.map((question, qsnIndex) =>
+        fetchThematifiedQuestion(question, validSelectedThemes[qsnIndex % validSelectedThemes.length]),
+      );
 
       const results = await Promise.all(questionRequests);
       const thematifiedQuestions = results.map((result) => result.data.result);
@@ -87,9 +97,44 @@ function App() {
     }
   };
 
+  const handleClickTheme = (themeId: string) => {
+    setSelectedThemes((prevThemes) => {
+      if (prevThemes.includes(themeId)) {
+        return prevThemes.filter((item) => item !== themeId);
+      }
+
+      return [...prevThemes, themeId];
+    });
+  };
+
   return (
     <Container sx={styles.container} maxWidth="xl">
       <Typography variant="h3">No more Boring Math problems!</Typography>
+      <Stack
+        sx={{
+          gap: 1,
+          maxWidth: "100%",
+          overflow: "auto",
+          pb: 0.5,
+        }}
+        className="customScrollbar"
+      >
+        <Typography variant="h5">Choose stuff you like</Typography>
+
+        <Stack direction="row" gap={1}>
+          {themes.map((theme) => (
+            <ThemeCard
+              key={theme.value}
+              id={theme.value}
+              title={theme.label}
+              img={theme.imgUrl}
+              selected={selectedThemes.includes(theme.value)}
+              onClick={handleClickTheme}
+            />
+          ))}
+        </Stack>
+      </Stack>
+
       <Stack sx={styles.mainContent}>
         <Stack sx={styles.questionsContainer}>
           <Typography variant="h5">💤 Boring problems</Typography>
@@ -101,17 +146,6 @@ function App() {
         </Stack>
 
         <Stack sx={styles.actionColumn}>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={themes}
-            getOptionLabel={(option) => option.label}
-            value={theme}
-            onChange={handleThemeChange}
-            sx={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Theme" />}
-          />
-
           <LoadingButton
             variant="contained"
             onClick={fetchThematifiedQuestions}

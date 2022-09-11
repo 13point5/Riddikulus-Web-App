@@ -14,7 +14,7 @@ export const mainContent: Styles = {
   gap: 5,
   flexDirection: "row",
   justifyContent: "space-between",
-  height: "80vh",
+  height: "400px",
   width: "100%",
 };
 

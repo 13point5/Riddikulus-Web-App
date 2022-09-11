@@ -11,3 +11,17 @@ textarea {
     "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 1rem;
 }
+
+::-webkit-scrollbar {
+  height: 7px;
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b9b9b9bf;
+  border-radius: 10px;
+}
